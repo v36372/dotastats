@@ -122,19 +122,58 @@ class TeamDetail extends Component {
 			.then( res => {
 				if (res.ok) {
 					res.json().then((data) => {
-						this.setState({
-							listmatch: data
+						data.f10kHistory.forEach(function(match){
+							if (match.kill === 10) {
+								match.style = {
+									backgroundColor: 'cornflowerblue'
+								}
+							} else {
+								match.style = {
+									backgroundColor: 'orangered'
+								}
+							}
 						})
-						console.log(data)
+						this.setState({
+							teamDetail: data
+						})
 					})
 				}
 			})
 	}
 
 	render() {
+		const { teamDetail } = this.state
+
 		return (
 			<div>
 				{this.props.params.name}
+				<ul>
+					<li>Average kill: {teamDetail.avgkill}</li>
+					<li>Average death: {teamDetail.avgdeath}</li>
+					<li>Total kill: {teamDetail.totalkill}</li>
+					<li>Total death: {teamDetail.totaldeath}</li>
+					<li>Winrate: {teamDetail.winrate}</li>
+					<li>Average odds: {teamDetail.avgodds}</li>
+				</ul>
+				F10K history:
+				<ul>
+				{
+					teamDetail.f10kHistory
+						? teamDetail.f10kHistory.map(match => 
+							<li key={teamDetail.f10kHistory.indexOf(match)}>
+							<ul style={match.style}>
+								<li>Opponent {match.name}</li>
+								<li>Winner {match.winner}</li>
+								<li>Kill {match.kill}</li>
+								<li>Death {match.death}</li>
+								<li>Time {match.time}</li>
+							</ul>
+							<hr/>
+							</li>
+						)
+						: ''
+				}
+				</ul>
 			</div>
 		)
 	}
