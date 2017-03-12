@@ -1,6 +1,18 @@
 import React, {Component} from 'react';
 import {render} from 'react-dom';
 import {Router, Route, browserHistory, Link} from 'react-router';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import FlatButton from 'material-ui/FlatButton';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import DatePicker from 'material-ui/DatePicker';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+import {List, ListItem} from 'material-ui/List';
+import Avatar from 'material-ui/Avatar';
+import {lightGreenA700, red700, transparent} from 'material-ui/styles/colors';
+import Divider from 'material-ui/Divider';
+import Moment from 'react-moment';
+injectTapEventPlugin();
 
 const DOTASTATS_API = `http://dotabetstats.herokuapp.com`
 
@@ -36,6 +48,24 @@ class Home extends Component {
 			<div>
 				hello world
 				<ListMatch listmatch={listmatch} />
+				<Card>
+    <CardHeader
+      title="URL Avatar"
+      subtitle="Subtitle"
+    />
+    <CardTitle title="Card title" subtitle="Card subtitle" />
+    <CardText>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Donec mattis pretium massa. Aliquam erat volutpat. Nulla facilisi.
+      Donec vulputate interdum sollicitudin. Nunc lacinia auctor quam sed pellentesque.
+      Aliquam dui mauris, mattis quis lacus id, pellentesque lobortis odio.
+    </CardText>
+    <CardActions>
+	
+      <FlatButton label="Action1" />
+      <FlatButton label="Action2" />
+    </CardActions>
+  </Card>
 			</div>
 		);
 	}
@@ -60,6 +90,7 @@ class TableRow extends Component {
 	render  (){
 		const { match } = this.props;
 		return (
+			<Card>
 			<div>
 				<div className="row">
 					<div className="col-md-4 text-center">
@@ -101,6 +132,7 @@ class TableRow extends Component {
 				}
 				<hr/>
 			</div>
+			</Card>
 		)
 	}
 }
@@ -145,8 +177,14 @@ class TeamDetail extends Component {
 		const { teamDetail } = this.state
 
 		return (
+			<Card>
+			<CardTitle title={this.props.params.name} subtitle="Data from: " />
 			<div>
-				{this.props.params.name}
+			<CardText>
+			<DatePicker hintText="From" autoOk defaultDate={new Date(Date.now() - 30 * 24 * 3600 * 1000)} container="inline" />
+			<DatePicker hintText="To" autoOk defaultDate={new Date()} container="inline" />
+			<Card>
+				<CardTitle title="Statistics"/>
 				<ul>
 					<li>Average kill: {teamDetail.avgkill}</li>
 					<li>Average death: {teamDetail.avgdeath}</li>
@@ -155,26 +193,44 @@ class TeamDetail extends Component {
 					<li>Winrate: {teamDetail.winrate}</li>
 					<li>Average odds: {teamDetail.avgodds}</li>
 				</ul>
-				F10K history:
-				<ul>
+			</Card>
+				<Card>
+				<CardTitle title="F10K history" />
+				<List>
 				{
 					teamDetail.f10kHistory
-						? teamDetail.f10kHistory.map(match => 
-							<li key={teamDetail.f10kHistory.indexOf(match)}>
-							<ul style={match.style}>
-								<li>Opponent {match.name}</li>
-								<li>Winner {match.winner}</li>
-								<li>Kill {match.kill}</li>
-								<li>Death {match.death}</li>
-								<li>Time {match.time}</li>
-							</ul>
-							<hr/>
-							</li>
+						? teamDetail.f10kHistory.map(match =>
+						<div key={teamDetail.f10kHistory.indexOf(match)} >
+							<ListItem 
+								primaryText={match.name} 
+								leftAvatar={
+									<Avatar
+										color={ match.winner.toLowerCase() !== match.name.toLowerCase()? lightGreenA700:red700} backgroundColor={transparent}
+										style={{left: 8}}
+									>
+									{match.winner.toLowerCase() !== match.name.toLowerCase()? "W":"L"}
+									</Avatar>
+								}
+								rightAvatar={
+								<p>
+								{
+									match.kill + " - " + match.death}
+								</p>
+								}
+								secondaryText={<p>
+									<Moment fromNow ago>{match.time}</Moment> ago</p>} 
+								/>
+								
+								<Divider inset={true} />
+								</div>
 						)
 						: ''
 				}
-				</ul>
+				</List>
+				</Card>
+			</CardText>
 			</div>
+			</Card>
 		)
 	}
 }
@@ -182,10 +238,12 @@ class TeamDetail extends Component {
 class Dotastats extends Component {
 	render() {
 		return (
+			<MuiThemeProvider muiTheme={getMuiTheme()}>
 			<Router history={browserHistory}>
 				<Route path='/' component={Home} />
 				<Route path='/team/:name' component={TeamDetail}/>
 			</Router>
+  </MuiThemeProvider>
 		)
 	}
 }
