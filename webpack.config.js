@@ -3,7 +3,7 @@ var webpack = require('webpack');
 
 const config = {
   cache: true,
-  entry: './js/main.js',
+  entry: './src/index.js',
   output: {
       path: __dirname + "/dist",
       filename: "main.js"
