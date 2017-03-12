@@ -1,9 +1,10 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
+import React, {Component} from 'react';
+import {render} from 'react-dom';
+import {Router, Route, browserHistory, Link} from 'react-router';
 
 const DOTASTATS_API = `http://dotabetstats.herokuapp.com`
 
-class IssuesApp extends React.Component {
+class Home extends Component {
 	constructor(config) {
 		super(config)
 		this.state = {
@@ -40,12 +41,12 @@ class IssuesApp extends React.Component {
 	}
 }
 
-var ListMatch = React.createClass({
-	renderTableRows: function() {
+class ListMatch extends Component {
+	renderTableRows() {
 		const { listmatch } = this.props;
 		return listmatch.map((i) => <TableRow match={i} key={i.id.toString()}/>);
-	},
-	render: function() {
+	}
+	render (){
 		const tableRows = this.renderTableRows();
 		return (
 			<div className="container-fluid">
@@ -53,24 +54,30 @@ var ListMatch = React.createClass({
 			</div>
 		)
 	}
-})
+}
 
-var TableRow = React.createClass({
-	render: function (){
+class TableRow extends Component {
+	render  (){
 		const { match } = this.props;
 		return (
 			<div>
 				<div className="row">
 					<div className="col-md-4 text-center">
-						<a href={"/match?id=" + match.id}>
-							{match.tournament} - {match.mode_name}
-						</a>
+						{match.tournament} - {match.mode_name}
 					</div>
 				</div>
 				<div className="row">
-					<div className="col-md-2">{match.teama}</div>
+					<div className="col-md-2">
+						<Link to={"/team/"+match.teama}>
+							{match.teama}
+						</Link>
+					</div>
 					<div className="col-md-2">{match.bestof}</div>
-					<div className="col-md-2">{match.teamb}</div>
+					<div className="col-md-2">
+						<Link to={"/team/"+match.teamb}>
+							{match.teamb}
+						</Link>
+					</div>
 				</div>
 				<div className="row">
 					<div className="col-md-3">{match.ratioa}</div>
@@ -96,7 +103,55 @@ var TableRow = React.createClass({
 			</div>
 		)
 	}
-})
+}
 
-ReactDOM.render(<IssuesApp />, document.getElementById('react-app'))
+class TeamDetail extends Component {
+	constructor(config) {
+		super(config)
+		this.state = {
+			teamDetail:{}
+		}
+	}
+
+	componentDidMount(){
+		this.fetchTeamDetail()
+	}
+
+	fetchTeamDetail = () => {
+		fetch(DOTASTATS_API + "/f10k/" + this.props.params.name)
+			.then( res => {
+				if (res.ok) {
+					res.json().then((data) => {
+						this.setState({
+							listmatch: data
+						})
+						console.log(data)
+					})
+				}
+			})
+	}
+
+	render() {
+		return (
+			<div>
+				{this.props.params.name}
+			</div>
+		)
+	}
+}
+
+class Dotastats extends Component {
+	render() {
+		return (
+			<Router history={browserHistory}>
+				<Route path='/' component={Home} />
+				<Route path='/team/:name' component={TeamDetail}/>
+			</Router>
+		)
+	}
+}
+
+render(<Dotastats/>,document.getElementById('react-app'));
+
+export default Dotastats
 
