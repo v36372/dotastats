@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {render} from 'react-dom';
 import {Router, Route, browserHistory, Link} from 'react-router';
 
-const DOTASTATS_API = `http://dotabetstats.herokuapp.com`
+const DOTASTATS_API = `https://dotabetstats.herokuapp.com`
 
 class Home extends Component {
 	constructor(config) {
